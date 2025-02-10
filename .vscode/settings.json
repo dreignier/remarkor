@@ -1,0 +1,33 @@
+{
+	"editor.insertSpaces": false,
+	"editor.tabSize": 2,
+	"editor.detectIndentation": false,
+	"editor.indentSize": "tabSize",
+	"editor.autoIndent": "advanced",
+	"files.insertFinalNewline": true,
+	"files.trimTrailingWhitespace": true,
+	"editor.trimAutoWhitespace": true,
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"files.eol": "\n",
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": "explicit",
+		"source.fixAll": "explicit"
+	},
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"typescript.preferences.importModuleSpecifier": "relative",
+	"typescript.preferences.quoteStyle": "single",
+	"typescript.format.semicolons": "remove",
+	"typescript.format.indentSwitchCase": false,
+	"javascript.format.semicolons": "remove",
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.quickSuggestions": {
+  	"strings": "on"
+	}
+}
+
