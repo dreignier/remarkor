@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
-      "module": "system",
+      "module": "NodeNext",
       "noImplicitAny": true,
       "removeComments": true,
       "preserveConstEnums": true,
       "outDir": "./dist",
-      "sourceMap": true
+      "sourceMap": true,
+			"lib": ["ESNext", "DOM"],
+			"moduleResolution": "NodeNext"
     },
     "include": ["src/**/*"]
-  } 
+  }
