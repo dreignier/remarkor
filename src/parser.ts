@@ -12,10 +12,18 @@ export default class Parser {
 		let current = root
 
 		for (let i = 0; i < markdown.length; ) {
+			if (markdown[i] === '\n' && current.feature && !current.feature.multiline) {
+				current = current.parent
+			}
+
 			const segment = markdown.slice(i)
 
 			if (current.feature?.end && segment.startsWith(current.feature.end)) {
-				i += current.feature.end.length
+				if (current.feature.end !== '\n' && !current.feature.multiline) {
+					i += current.feature.end.length
+				}
+
+				current.end = true
 				current = current.parent
 			} else {
 				const feature = features.find((feature) => segment.startsWith(feature.start))
@@ -23,6 +31,13 @@ export default class Parser {
 				if (feature) {
 					i += feature.start.length
 					current = current.addChild(feature)
+
+					if (feature.consumes) {
+						while (markdown[i] && feature.consumes.includes(markdown[i])) {
+							i++
+							current.consumed += markdown[i]
+						}
+					}
 				} else {
 					current.addText(markdown[i++])
 				}
@@ -43,20 +58,26 @@ export default class Parser {
 
 		return markdown
 			.replace(/\r/g, '')
+			.replace('  +', ' ')
 			.replace('\t', '    ')
 			.replace(/ +\n +/g, '\n')
 			.replace(/\n\n+/g, '\n\n')
-			.replace('  +', ' ')
 	}
 }
 
 class Element {
 	content: (Element | string)[] = []
+	end = false
+	consumed = ''
 
 	constructor(
 		public parent?: Element,
 		public feature?: Feature
-	) {}
+	) {
+		if (!this.feature) {
+			this.end = true
+		}
+	}
 
 	addChild(feature?: Feature) {
 		const child = new Element(this, feature)
@@ -74,24 +95,37 @@ class Element {
 	}
 
 	toHtml() {
-		let html = ''
-
-		if (this.feature) {
-			if (this.feature.before) {
-				html += this.feature.before
-			}
-
-			html += `<${this.feature.tag}>`
+		if (!this.end || (this.feature?.void && this.content.length)) {
+			return this.feature.start + this.consumed + this.content.join('')
 		}
 
-		const content = this.content.join('')
-		html += this.feature?.trim ? content.trim() : content
+		let html = ''
+		let tag = ''
 
 		if (this.feature) {
-			html += `</${this.feature.tag}>`
+			if (this.feature.end == '\n' || this.feature.multiline) {
+				html += '\n'
+			}
 
-			if (this.feature.after) {
-				html += this.feature.after
+			tag = this.feature.tag
+			if (this.feature.consumes) {
+				tag = tag.replace('$', (this.consumed.length + 1).toString())
+			}
+
+			html += `<${tag}>`
+		}
+
+		if (this.content.length) {
+			html += this.content.join('')
+		}
+
+		if (this.feature) {
+			if (!this.feature.void) {
+				html += `</${tag}>`
+			}
+
+			if (this.feature.end == '\n' || this.feature.multiline) {
+				html += '\n'
 			}
 		}
 
