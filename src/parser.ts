@@ -10,9 +10,10 @@ export default class Parser {
 
 		const root = new Element()
 		let current = root
+		current = root.addChild(features.find((feature) => feature.name === 'page'))
 
 		for (let i = 0; i < markdown.length; ) {
-			if (markdown[i] === '\n' && current.feature && !current.feature.multiline && !current.feature.line) {
+			if (markdown[i] === '\n' && current.feature && !current.feature.multiline && !current.feature.line && !current.feature.block) {
 				current = current.parent
 			}
 
@@ -29,6 +30,14 @@ export default class Parser {
 				const feature = features.find((feature) => segment.startsWith(feature.start) && (!feature.parent || current.feature?.tag === feature.parent))
 
 				if (feature) {
+					if (feature.block) {
+						while (current.feature?.name !== feature.name) {
+							current = current.parent
+						}
+
+						current = current.parent
+					}
+
 					i += feature.start.length
 					current = current.addChild(feature)
 
@@ -71,14 +80,18 @@ class Element {
 		public parent?: Element,
 		public feature?: Feature
 	) {
-		if (!this.feature) {
+		if (!this.feature || this.feature.block) {
 			this.end = true
 		}
 	}
 
-	addChild(feature?: Feature) {
+	addChild(feature?: Feature): Element {
 		const child = new Element(this, feature)
 		this.content.push(child)
+
+		if (feature?.child) {
+			return child.addChild(features.find((f) => f.name === feature.child))
+		}
 
 		return child
 	}
@@ -92,10 +105,6 @@ class Element {
 	}
 
 	toHtml() {
-		if (this.feature?.html) {
-			return this.feature.html
-		}
-
 		if (!this.end || (this.feature?.void && this.content.length)) {
 			return this.feature.start + this.consumed + this.content.join('')
 		}
@@ -113,7 +122,13 @@ class Element {
 				tag = tag.replace('$', (this.consumed.length + 1).toString())
 			}
 
-			html += `<${tag}>`
+			html += `<${tag}`
+
+			if (this.feature.class) {
+				html += ` class="${this.feature.class}"`
+			}
+
+			html += '>'
 		}
 
 		if (this.content.length) {

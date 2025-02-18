@@ -20,7 +20,7 @@ export default class Remarkor {
 
 		if (theme) {
 			await cp(__dirname + `/assets/themes/${theme}.css`, output + `/${theme}.css`)
-			await cp(__dirname + `/assets/themes/${theme}.css`, output + `/${theme}.css`)
+			await cp(__dirname + `/assets/themes/${theme}.css.map`, output + `/${theme}.css.map`)
 		}
 
 		return html

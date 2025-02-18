@@ -1,3 +1,5 @@
+@use "../../node_modules/modern-normalize/modern-normalize.css";
+
 @font-face {
 	font-family: 'Segoe UI Regular';
 	font-style: normal;
@@ -26,8 +28,35 @@
 	src: local('Segoe UI Bold Italic'), url('Segoe UI Bold Italic.ttf') format('truetype');
 }
 
-p {
-	strong {
-		color: red;
+body {
+	background-color: black;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+}
+
+.page {
+	width: 21cm;
+	height: 29.7cm;
+	background-color: white;
+	position: relative;
+	page-break-before: always;
+	page-break-after: always;
+	padding: 0 1cm 0 1cm;
+
+	>section {
+		display: flex;
+		gap: 0.5cm;
+
+		>section {
+			flex: 1 1 0%;
+		}
+	}
+}
+
+@media print {
+	body {
+		gap: 0;
 	}
 }
