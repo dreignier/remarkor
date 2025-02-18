@@ -12,21 +12,21 @@ export default class Parser {
 		let current = root
 
 		for (let i = 0; i < markdown.length; ) {
-			if (markdown[i] === '\n' && current.feature && !current.feature.multiline) {
+			if (markdown[i] === '\n' && current.feature && !current.feature.multiline && !current.feature.line) {
 				current = current.parent
 			}
 
 			const segment = markdown.slice(i)
 
 			if (current.feature?.end && segment.startsWith(current.feature.end)) {
-				if (current.feature.end !== '\n' && !current.feature.multiline) {
+				if (!current.feature.line && !current.feature.multiline) {
 					i += current.feature.end.length
 				}
 
 				current.end = true
 				current = current.parent
 			} else {
-				const feature = features.find((feature) => segment.startsWith(feature.start))
+				const feature = features.find((feature) => segment.startsWith(feature.start) && (!feature.parent || current.feature?.tag === feature.parent))
 
 				if (feature) {
 					i += feature.start.length
@@ -38,25 +38,22 @@ export default class Parser {
 							current.consumed += markdown[i]
 						}
 					}
+
+					if (feature.single) {
+						current.end = true
+						current = current.parent
+					}
 				} else {
 					current.addText(markdown[i++])
 				}
 			}
 		}
 
-		return root.toString().trim()
+		return root.toHtml()
 	}
 
 	sanitize(markdown: string) {
-		if (markdown[0] !== '\n') {
-			markdown = '\n' + markdown
-		}
-
-		if (markdown[markdown.length - 1] !== '\n') {
-			markdown += '\n'
-		}
-
-		return markdown
+		return ('\n\n' + markdown + '\n\n')
 			.replace(/\r/g, '')
 			.replace('  +', ' ')
 			.replace('\t', '    ')
@@ -95,6 +92,10 @@ class Element {
 	}
 
 	toHtml() {
+		if (this.feature?.html) {
+			return this.feature.html
+		}
+
 		if (!this.end || (this.feature?.void && this.content.length)) {
 			return this.feature.start + this.consumed + this.content.join('')
 		}
@@ -124,7 +125,7 @@ class Element {
 				html += `</${tag}>`
 			}
 
-			if (this.feature.end == '\n' || this.feature.multiline) {
+			if (this.feature.end == '\n' || this.feature.start == '\n' || this.feature.multiline) {
 				html += '\n'
 			}
 		}
