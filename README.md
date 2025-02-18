@@ -18,10 +18,8 @@
   - Le header peut être ajouté par le thème, mais il faut lui donner le titre ? Et si le titre n'est pas donné, on met pas l'élément ? Mais comment on gère ça ? En css ? (boolean en css ?)
 	- Comment on gère le contenu du titre ?
 - Comment gérer les footers ?
-  - Section spéciale. Mais ça oblgie à le mettre à la fin de la page. Pas cool ?
+  - Section spéciale. Mais ça oblige à le mettre à la fin de la page. Pas cool ?
 - Comment gérer les ajouts automatiques ?
 - Tout ça en fonction des thèmes ?
 - Page spéciale quand le thème le prévoit ?
 	- Permettre d'ajouter une classe à la page
-
-- Les pages et les sections doivent être des vrais éléments !

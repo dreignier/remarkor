@@ -10,7 +10,10 @@ export default class Parser {
 
 		const root = new Element()
 		let current = root
-		current = root.addChild(features.find((feature) => feature.name === 'page'))
+		const initial = features.find((feature) => feature.initial)
+		if (initial) {
+			current = root.addChild(initial)
+		}
 
 		for (let i = 0; i < markdown.length; ) {
 			if (markdown[i] === '\n' && current.feature && !current.feature.multiline && !current.feature.line && !current.feature.block) {
@@ -24,12 +27,23 @@ export default class Parser {
 					i += current.feature.end.length
 				}
 
+				const next = current.parent
+
+				if (current.feature?.target) {
+					current.moveTo(current.feature.target)
+				}
+
 				current.end = true
-				current = current.parent
+				current = next
 			} else {
-				const feature = features.find((feature) => segment.startsWith(feature.start) && (!feature.parent || current.feature?.tag === feature.parent))
+				const feature = features.find((feature) => segment.startsWith(feature.start) && (!feature.parent || current.feature?.name === feature.parent))
 
 				if (feature) {
+					if (feature.line && current.feature?.multiline) {
+						current.end = true
+						current = current.parent
+					}
+
 					if (feature.block) {
 						while (current.feature?.name !== feature.name) {
 							current = current.parent
@@ -41,8 +55,9 @@ export default class Parser {
 					i += feature.start.length
 					current = current.addChild(feature)
 
-					if (feature.consumes) {
-						while (markdown[i] && feature.consumes.includes(markdown[i])) {
+					if (feature.line) {
+						const consumes = feature.start.replace(/\n/g, '')
+						while (markdown[i] && consumes.includes(markdown[i])) {
 							i++
 							current.consumed += markdown[i]
 						}
@@ -53,7 +68,7 @@ export default class Parser {
 						current = current.parent
 					}
 				} else {
-					current.addText(markdown[i++])
+					current = current.addText(markdown[i++])
 				}
 			}
 		}
@@ -71,7 +86,7 @@ export default class Parser {
 	}
 }
 
-class Element {
+export class Element {
 	content: (Element | string)[] = []
 	end = false
 	consumed = ''
@@ -85,6 +100,34 @@ class Element {
 		}
 	}
 
+	moveTo(name: string) {
+		const parent = this.findParent(name)
+
+		if (parent) {
+			this.parent.content = this.parent.content.filter((child) => child !== this)
+			parent.content.unshift(this)
+		}
+	}
+
+	findParent(name: string) {
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		let current: Element = this
+
+		while (current && current.feature?.name !== name) {
+			current = current.parent
+		}
+
+		return current
+	}
+
+	index() {
+		if (!this.parent) {
+			return 0
+		}
+
+		return this.parent.content.indexOf(this)
+	}
+
 	addChild(feature?: Feature): Element {
 		const child = new Element(this, feature)
 		this.content.push(child)
@@ -96,17 +139,27 @@ class Element {
 		return child
 	}
 
-	addText(text: string) {
+	addText(text: string): Element {
+		if (this.feature?.textContainer) {
+			return this.addChild(features.find((feature) => feature.name === this.feature.textContainer)).addText(text)
+		}
+
 		if (this.content.length && typeof this.content[this.content.length - 1] === 'string') {
 			this.content[this.content.length - 1] += text
 		} else {
 			this.content.push(text)
 		}
+
+		return this
 	}
 
 	toHtml() {
 		if (!this.end || (this.feature?.void && this.content.length)) {
 			return this.feature.start + this.consumed + this.content.join('')
+		}
+
+		if (this.feature?.trim && !this.content.length) {
+			return ''
 		}
 
 		let html = ''
@@ -118,7 +171,7 @@ class Element {
 			}
 
 			tag = this.feature.tag
-			if (this.feature.consumes) {
+			if (this.feature.line) {
 				tag = tag.replace('$', (this.consumed.length + 1).toString())
 			}
 
@@ -132,10 +185,20 @@ class Element {
 		}
 
 		if (this.content.length) {
-			html += this.content.join('')
+			const contentHtml = this.content.join('')
+
+			if (this.feature?.trim && !contentHtml.trim()) {
+				return ''
+			}
+
+			html += contentHtml
 		}
 
 		if (this.feature) {
+			if (this.feature.append) {
+				html += this.feature.append(this)
+			}
+
 			if (!this.feature.void) {
 				html += `</${tag}>`
 			}
