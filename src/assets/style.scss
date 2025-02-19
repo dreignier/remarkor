@@ -55,6 +55,21 @@ article {
 	font-size: 12px;
 	font-family: "Segoe Regular", sans-serif;
 
+	.page-title {
+		padding-top: 0.25cm;
+		text-align: center;
+		text-transform: uppercase;
+	}
+
+	.page-number {
+		position: absolute;
+		padding-bottom: 0.25cm;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		text-align: center;
+	}
+
 	section, footer, header {
 		display: flex;
 		gap: 0.5cm;
@@ -69,7 +84,7 @@ article {
 		padding-top: 0.5cm;
 	}
 
-	header {
+	header:first-child {
 		padding-top: 0.5cm;
 	}
 
@@ -78,7 +93,7 @@ article {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		padding-bottom: 0.5cm;
+		padding-bottom: 1cm;
 	}
 
 	em {
@@ -98,6 +113,19 @@ article {
 	p {
 		margin-bottom: 0.25cm;
 		text-align: justify;
+		text-wrap: pretty;
+
+		&.left {
+			text-align: left;
+		}
+
+		&.right {
+			text-align: right;
+		}
+
+		&.center {
+			text-align: center;
+		}
 
 		&:empty {
 			margin-bottom: 0;
@@ -120,7 +148,7 @@ article {
 		font-family: "Segoe UI Bold", sans-serif;
 		text-transform: uppercase;
 		font-weight: bold;
-		margin-bottom: 10px;
+		margin-bottom: 0.125cm;
 		letter-spacing: 1px;
 
 		&:last-child {
@@ -139,7 +167,7 @@ article {
 	}
 
 	h3 {
-		margin-left: 16px;
+		margin-left: 0.5cm;
 		font-family: "Segoe Regular", sans-serif;
 	}
 
@@ -168,6 +196,15 @@ article {
 		&:last-child {
 			margin-bottom: 0;
 		}
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	img[height] {
+		height: revert-layer;
 	}
 }
 

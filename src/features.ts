@@ -1,66 +1,51 @@
+import { Feature, TextFeature } from './feature'
 import { Element } from './parser'
 
-export type Feature = {
-	name: string
-	start: string
-	end?: string
-	tag: string
-	class?: string
-	void?: boolean
-	multiline?: boolean
-	single?: boolean
-	parent?: string
-	line?: boolean
-	block?: boolean
-	child?: string
-	trim?: boolean
-	textContainer?: string
-	initial?: boolean
-	target?: string
-	append?: (element: Element) => string
-}
-
 export const features: Feature[] = [
-	{
-		name: 'page',
-		start: '===',
-		tag: 'article',
-		line: true,
-		block: true,
-		child: 'section',
-		trim: true,
-		initial: true,
-		append: (element: Element) => `<div class="page-number">${element.index() + 1}</div>`
-	},
-	{ name: 'section', start: '___', tag: 'section', line: true, block: true, child: 'column', trim: true },
-	{ name: 'section', start: '^^^', tag: 'header', line: true, block: true, child: 'column', trim: true },
-	{ name: 'section', start: '~~~', tag: 'footer', line: true, block: true, child: 'column', trim: true },
-	{ name: 'column', start: '|||', tag: 'div', class: 'column', line: true, block: true, trim: true, textContainer: 'paragraph' },
-	{ name: 'hr', start: '---', tag: 'hr', void: true, single: true, line: true },
-	{ name: 'bold', start: '**', end: '**', tag: 'strong' },
-	{ name: 'small', start: '--', end: '--', tag: 'small' },
-	{ name: 'mark', start: '++', end: '++', tag: 'mark' },
-	{ name: 'italic', start: '*', end: '*', tag: 'em' },
-	{ name: 'underline', start: '__', end: '__', tag: 'u' },
-	{ name: 'stroke', start: '~~', end: '~~', tag: 'del' },
-	{ name: 'sup', start: '^', end: '^', tag: 'sup' },
-	{ name: 'sub', start: '~', end: '~', tag: 'sub' },
-	{ name: 'header', start: '#', tag: 'h$', line: true },
-	{ name: 'title', start: '@', tag: 'div', class: 'page-title', line: true, target: 'page' },
-	{ name: 'paragraph', start: '\n\n', end: '\n\n', tag: 'p', multiline: true, trim: true },
-	{ name: 'break', start: '\n', single: true, tag: 'br', void: true, parent: 'paragraph' }
-].flatMap((feature: Feature) => {
-	if (feature.block) {
-		return [
-			{ ...feature, start: '\n' + feature.start },
-			{ ...feature, start: '\n\n' + feature.start }
-		]
-	} else if (feature.line && !feature.single) {
-		return [
-			{ ...feature, start: '\n' + feature.start, end: '\n' },
-			{ ...feature, start: '\n\n' + feature.start, end: '\n' }
-		]
+	{ feature: 'page article ===', block: true, child: 'section', append: (element: Element) => `<div class="page-number">${element.index() + 1}</div>` },
+	{ feature: 'section section ___', block: true, child: 'column' },
+	{ feature: 'section header ^^^', block: true, child: 'column' },
+	{ feature: 'section footer ~~~', block: true, child: 'column' },
+	{ feature: 'column div |||', block: true, class: 'column', textContainer: 'paragraph' },
+	{ feature: 'hr hr --- \n', void: true },
+	{ feature: 'bold strong ** **' },
+	{ feature: 'small small -- --' },
+	{ feature: 'mark mark ++ ++' },
+	{ feature: 'italic em * *' },
+	{ feature: 'underline u __ __' },
+	{ feature: 'stroke del ~~ ~~' },
+	{ feature: 'sup sup ^ ^' },
+	{ feature: 'sub sub ~ ~' },
+	{ feature: 'header h$ # \n' },
+	{ feature: 'title div @ \n', class: 'page-title', target: ['page'] },
+	{ feature: 'paragraph p \n\n \n\n', multiline: true },
+	{ feature: 'break br \n', void: true, parent: 'paragraph' }
+].map((options) => {
+	const [name, tag, start, end] = options.feature.split(' ')
+	const feature = new Feature(name, tag, start, end)
+	feature.setup(options)
+	return feature
+})
+
+export const textFeatures: TextFeature[] = [
+	{ name: 'image', regexp: /!([0-9x]*)\[(.*?)\]\((.*?)\)/, replace: (_: string, size: string, alt: string, src: string) => `<img src="${src}" alt="${alt}"${parseSize(size)}>` },
+	{ name: 'autoimage', regexp: /(^|\s)!([0-9x]+;)?(https?:\/\/[^\s]+)/, replace: (_: string, before: string, size: string, src: string) => `${before}<img src="${src}"${parseSize(size)}>` },
+	{ name: 'link', regexp: /\[(.*?)\]\((.*?)\)/, replace: '<a href="$2">$1</a>' },
+	{ name: 'autolink', regexp: /(^|\s)(https?:\/\/[^\s]+)/, replace: '$1<a href="$2">$2</a>' }
+].map((options) => {
+	return new TextFeature(options.name, options.regexp, options.replace)
+})
+
+function parseSize(size: string): string {
+	if (!size) {
+		return ''
 	}
 
-	return [feature]
-})
+	const [width, height] = size.replace(';', '').split('x')
+
+	if (!width && !height) {
+		return ''
+	}
+
+	return ` width="${width ? width + 'px' : 'auto'}" height="${height ? height + 'px' : 'auto'}"`
+}
