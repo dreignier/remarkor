@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, rm, writeFile } from 'fs/promises'
+import { cp, mkdir, readFile, writeFile } from 'fs/promises'
 import Parser from './parser'
 
 export default class Remarkor {
@@ -12,7 +12,6 @@ export default class Remarkor {
 		html = template.replace('$html', html).replace(/\$theme/g, theme || 'none')
 
 		// Make sure the output directory is empty
-		await rm(output, { recursive: true, force: true })
 		await mkdir(output, { recursive: true })
 
 		await writeFile(output + '/index.html', html)

@@ -252,7 +252,12 @@ export class Element {
 
 				const classes = this.class.concat(this.feature.class || [])
 				if (classes.length) {
-					html += ` class="${classes.join(' ')}"`
+					let classesAttribute = classes.join(' ')
+					if (this.feature.consumeStart()) {
+						classesAttribute = classesAttribute.replace('$', (this.consumed.length + 1).toString())
+					}
+
+					html += ` class="${classesAttribute}"`
 				}
 
 				for (const [key, value] of Object.entries(this.attributes)) {
