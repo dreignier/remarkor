@@ -9,6 +9,10 @@ export class Feature {
 	child?: string
 	textContainer?: string
 	target?: string[]
+	attribute?: string
+	value?: string
+	break?: string[]
+	text?: boolean
 	append?: (element: Element) => string
 
 	constructor(
@@ -20,6 +24,13 @@ export class Feature {
 
 	setup(options: Partial<Feature>) {
 		Object.assign(this, options)
+
+		if (this.attribute) {
+			this.start = this.tag
+			this.end = '\n'
+			this.tag = ''
+			this.void = true
+		}
 	}
 
 	line() {
@@ -62,6 +73,10 @@ export class Feature {
 
 	consumeStart() {
 		return this.line() || this.block
+	}
+
+	autoclose() {
+		return this.block || (this.void && !this.end)
 	}
 }
 

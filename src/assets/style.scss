@@ -110,22 +110,21 @@ article {
 		font-family: "Segoe UI Bold Italic", sans-serif;
 	}
 
+	.text-left {
+		text-align: left;
+	}
+
+	.text-right {
+		text-align: right;
+	}
+
+	.text-center {
+		text-align: center;
+	}
+
 	p {
 		margin-bottom: 0.25cm;
 		text-align: justify;
-		text-wrap: pretty;
-
-		&.left {
-			text-align: left;
-		}
-
-		&.right {
-			text-align: right;
-		}
-
-		&.center {
-			text-align: center;
-		}
 
 		&:empty {
 			margin-bottom: 0;
@@ -201,6 +200,20 @@ article {
 	img {
 		max-width: 100%;
 		height: auto;
+
+		&.img-left {
+			float: left;
+		}
+
+		&.img-right {
+			float: right;
+		}
+
+		&.img-center {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
 	}
 
 	img[height] {
