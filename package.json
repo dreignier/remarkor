@@ -4,7 +4,7 @@
 	"scripts": {
 		"lint": "eslint",
 		"build": "tsc && npm run copyfiles && npm run sass",
-		"copyfiles": "copyfiles -u 1 src/assets/template.html dist/ && copyfiles -u 1 src/assets/static/* dist/",
+		"copyfiles": "copyfiles -u 1 src/assets/template.html dist/ && copyfiles -u 1 src/assets/static/* dist/ && copyfiles -u 3 src/assets/themes/**/* dist/assets/themes/ -e src/assets/themes/**/*.scss",
 		"sass": "sass src/assets/style.scss dist/assets/static/style.css && sass src/assets/themes:dist/assets/themes",
 		"start": "node dist/index.js",
 		"watch": "node dist/index.js --watch"

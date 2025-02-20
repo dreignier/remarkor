@@ -19,8 +19,7 @@ export default class Remarkor {
 		await cp(__dirname + '/assets/static', output, { recursive: true })
 
 		if (theme) {
-			await cp(__dirname + `/assets/themes/${theme}.css`, output + `/${theme}.css`)
-			await cp(__dirname + `/assets/themes/${theme}.css.map`, output + `/${theme}.css.map`)
+			await cp(__dirname + `/assets/themes/${theme}`, output, { recursive: true })
 		}
 
 		return html
