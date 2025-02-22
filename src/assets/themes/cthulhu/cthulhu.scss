@@ -1,7 +1,98 @@
+@font-face {
+	font-family: "Playwrite USA Traditional Regular";
+	font-style: normal;
+	font-weight: normal;
+	src: local("Playwrite USA Traditional Regular"), url("PlaywriteUSTrad-Regular.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: "Playwrite USA Traditional Light";
+	font-style: normal;
+	font-weight: normal;
+	src: local("Playwrite USA Traditional Light"), url("PlaywriteUSTrad-Light.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: "Playwrite USA Traditional ExtraLight";
+	font-style: normal;
+	font-weight: normal;
+	src: local("Playwrite USA Traditional ExtraLight"), url("PlaywriteUSTrad-ExtraLight.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: "Playwrite USA Traditional Thin";
+	font-style: normal;
+	font-weight: normal;
+	src: local("Playwrite USA Traditional Thin"), url("PlaywriteUSTrad-Thin.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: "Moon Dance Regular";
+	font-style: normal;
+	font-weight: normal;
+	src: local("Moon Dance Regular"), url("MoonDance-Regular.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: "Eagle Lake Regular";
+	font-style: normal;
+	font-weight: normal;
+	src: local("Eagle Lake Regular"), url("EagleLake-Regular.ttf") format("truetype");
+}
+
 .cthulhu {
-	p {
+	article {
+		background-image: url("background.png");
+		background-size: auto 100%;
+		background-repeat: no-repeat;
+		background-color: rgba(255, 255, 255, 0.5);
+		background-blend-mode: lighten;
+		font-family: "Playwrite USA Traditional Light", sans-serif;
+
+		&:nth-child(even) {
+			background-position: right;
+		}
+
+		&:nth-child(odd) {
+			background-position: left;
+		}
+
+		.page-number, .page-title {
+			font-family: "Moon Dance Regular", sans-serif;
+			font-weight: bold;
+		}
+
+		em {
+			font-family: "Playwrite USA Traditional ExtraLight", sans-serif;
+			font-style: italic;
+		}
+
 		strong {
-			color: blue;
+			font-family: "Playwrite USA Traditional Regular", sans-serif;
+			font-weight: bold;
+		}
+
+		em strong,
+		strong em {
+			font-family: "Playwrite USA Traditional Light", sans-serif;
+		}
+
+		h1 {
+			font-family: "Eagle Lake Regular", sans-serif;
+		}
+
+		h2 {
+			font-family: "Moon Dance Regular", sans-serif;
+			text-align: left;
+			font-size: 26px;
+			margin-left: 0.5cm;
+		}
+
+		h3 {
+			font-family: "Playwrite USA Traditional Regular", sans-serif;
+			font-weight: bold;
+			font-size: 10px;
+			margin-left: 0;
 		}
 	}
 }

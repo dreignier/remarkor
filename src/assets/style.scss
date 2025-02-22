@@ -150,6 +150,20 @@ article {
 		font-family: "Segoe UI Bold Italic", sans-serif;
 	}
 
+	q {
+		&::before {
+			padding-right: 0.075cm;
+			position: relative;
+			bottom: 0.02cm;
+		}
+
+		&::after {
+			padding-left: 0.075cm;
+			position: relative;
+			bottom: 0.02cm;
+		}
+	}
+
 	.text-left {
 		text-align: left;
 	}

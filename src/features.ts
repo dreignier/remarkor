@@ -16,6 +16,7 @@ export const features: Feature[] = [
 	{ feature: 'stroke del ~~ ~~' },
 	{ feature: 'sup sup ^ ^' },
 	{ feature: 'sub sub ~ ~' },
+	{ feature: 'quote q " "' },
 	{ feature: 'header h$ # \n' },
 	{ feature: 'title div @ \n', class: 'page-title', target: ['page'] },
 	{ feature: 'center >><<', attribute: 'class', value: 'text-center', target: ['paragraph', 'column'], text: true },
@@ -43,7 +44,8 @@ export const textFeatures: TextFeature[] = [
 		replace: (_: string, before: string, attributes: string, src: string) => `${before}<img src="${src}"${parseAttributes(attributes)}>`
 	},
 	{ name: 'link', regexp: /\[(.*?)\]\((.*?)\)/, replace: '<a href="$2">$1</a>' },
-	{ name: 'autolink', regexp: /(^|\s)(https?:\/\/[^\s]+)/, replace: '$1<a href="$2">$2</a>' }
+	{ name: 'autolink', regexp: /(^|\s)(https?:\/\/[^\s]+)/, replace: '$1<a href="$2">$2</a>' },
+	{ name: 'apostrophe', regexp: /'/g, replace: '’', parent: 'paragraph' }
 ].map((options) => {
 	return new TextFeature(options.name, options.regexp, options.replace)
 })

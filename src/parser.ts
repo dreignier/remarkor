@@ -18,11 +18,25 @@ export default class Parser {
 			}
 
 			const segment = markdown.slice(i)
-			const end = current.feature.end && segment.startsWith(current.feature.end)
+
+			let feature: Feature
+			let start: string
+			let end: string
+			for (feature of features) {
+				if (feature === current.feature) {
+					end = feature.scanEnd(segment)
+				} else {
+					start = feature.scanStart(segment, current.feature)
+				}
+
+				if (start || end) {
+					break
+				}
+			}
 
 			if (current.feature.void && !end) {
 				current = current.parent
-			} else if (current.feature.end && end) {
+			} else if (end) {
 				if (current.feature.consumeEnd()) {
 					i += current.feature.end.length
 				}
@@ -30,54 +44,42 @@ export default class Parser {
 				const next = current.parent
 				current.close()
 				current = next
+			} else if (start) {
+				if (feature.line() && current.feature.multiline) {
+					current.close()
+					current = current.parent
+				}
+
+				if (feature.block) {
+					current = current.findParent([feature.name]).parent
+				}
+
+				i += start.length
+				if (feature.text) {
+					const container = current.exploreParent((element) => !!element.feature.textContainer)
+					if (container && current.feature.name !== container.feature.textContainer) {
+						current = container.addChild(findFeature(container.feature.textContainer))
+					}
+				}
+
+				if (feature.break) {
+					const parent = current.findParent(feature.break)
+					if (parent) {
+						parent.close()
+						current = parent.parent
+					}
+				}
+
+				current = current.addChild(feature)
+
+				if (current.feature.consumeStart()) {
+					const consumes = start.replace(/\n/g, '')
+					while (markdown[i] && consumes.includes(markdown[i])) {
+						current.consumed += markdown[i++]
+					}
+				}
 			} else {
-				let feature: Feature
-				let start: string
-				for (feature of features) {
-					start = feature.scan(segment, current.feature)
-
-					if (start) {
-						break
-					}
-				}
-
-				if (start) {
-					if (feature.line() && current.feature.multiline) {
-						current.close()
-						current = current.parent
-					}
-
-					if (feature.block) {
-						current = current.findParent([feature.name]).parent
-					}
-
-					i += start.length
-					if (feature.text) {
-						const container = current.exploreParent((element) => !!element.feature.textContainer)
-						if (container && current.feature.name !== container.feature.textContainer) {
-							current = container.addChild(findFeature(container.feature.textContainer))
-						}
-					}
-
-					if (feature.break) {
-						const parent = current.findParent(feature.break)
-						if (parent) {
-							parent.close()
-							current = parent.parent
-						}
-					}
-
-					current = current.addChild(feature)
-
-					if (current.feature.consumeStart()) {
-						const consumes = start.replace(/\n/g, '')
-						while (markdown[i] && consumes.includes(markdown[i])) {
-							current.consumed += markdown[i++]
-						}
-					}
-				} else {
-					current = current.addText(markdown[i++])
-				}
+				current = current.addText(markdown[i++])
 			}
 		}
 
@@ -278,6 +280,10 @@ export class Element {
 					}
 
 					for (const feature of textFeatures) {
+						if (feature.parent && this.feature.name !== feature.parent) {
+							continue
+						}
+
 						child = feature.process(child)
 					}
 

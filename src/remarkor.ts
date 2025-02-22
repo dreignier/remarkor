@@ -5,6 +5,10 @@ export default class Remarkor {
 	private parser = new Parser()
 
 	async remark(input: string, output: string, theme?: string) {
+		if (!theme) {
+			theme = 'default'
+		}
+
 		const markdown = await readFile(input, 'utf-8')
 		let html = this.parser.parse(markdown)
 
@@ -16,10 +20,7 @@ export default class Remarkor {
 
 		await writeFile(output + '/index.html', html)
 		await cp(__dirname + '/assets/static', output, { recursive: true })
-
-		if (theme) {
-			await cp(__dirname + `/assets/themes/${theme}`, output, { recursive: true })
-		}
+		await cp(__dirname + `/assets/themes/${theme}`, output, { recursive: true })
 
 		return html
 	}

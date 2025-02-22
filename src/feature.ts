@@ -37,7 +37,7 @@ export class Feature {
 		return this.end === '\n'
 	}
 
-	scan(markdown: string, parent?: Feature): string {
+	scanStart(markdown: string, parent?: Feature): string {
 		if (this.parent && parent?.name !== this.parent) {
 			return ''
 		}
@@ -63,6 +63,10 @@ export class Feature {
 		return ''
 	}
 
+	scanEnd(markdown: string) {
+		return markdown.startsWith(this.end) ? this.end : ''
+	}
+
 	stop(char: string) {
 		return char === '\n' && !this.multiline && !this.line() && !this.block
 	}
@@ -85,7 +89,8 @@ export class TextFeature {
 		public name: string,
 		public regexp: RegExp,
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		public replace: string | ((substring: string, ...args: any[]) => string)
+		public replace: string | ((substring: string, ...args: any[]) => string),
+		public parent?: string
 	) {}
 
 	process(text: string) {
