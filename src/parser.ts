@@ -34,6 +34,10 @@ export default class Parser {
 				}
 			}
 
+			if (start && current.feature.raw) {
+				start = ''
+			}
+
 			if (current.feature.void && !end) {
 				current = current.parent
 			} else if (end) {
@@ -101,6 +105,7 @@ export class Element {
 	end = false
 	consumed = ''
 	class: string[] = []
+	styles: Record<string, string> = {}
 	attributes: Record<string, string> = {}
 
 	constructor(
@@ -125,7 +130,18 @@ export class Element {
 				parent.addAttribute(this.feature.attribute, this.feature.value)
 			}
 
-			return ''
+			return
+		}
+
+		if (this.feature.style) {
+			// eslint-disable-next-line @typescript-eslint/no-this-alias
+			let target: Element = this
+			if (this.feature.style !== 'parent') {
+				target = this.findParent([this.feature.style])
+			}
+			target.addStyle(this.content.join(''))
+
+			return
 		}
 
 		if (this.feature.target) {
@@ -155,6 +171,21 @@ export class Element {
 			this.class.push(value)
 		} else {
 			this.attributes[key] = value
+		}
+	}
+
+	addStyle(command: string) {
+		const match = / *([a-z0-9A-Z_-]+) *:(.+)/.exec(command)
+		if (!match) {
+			return
+		}
+
+		const [key, value] = match.slice(1).map((v) => v.trim())
+
+		if (key === 'class') {
+			this.class.push(value)
+		} else {
+			this.styles[key] = value
 		}
 	}
 
@@ -223,7 +254,7 @@ export class Element {
 	}
 
 	toHtml(): string {
-		if (!this.feature.void && !this.content.length) {
+		if (this.feature.silent || (!this.feature.void && !this.content.length)) {
 			return ''
 		}
 
@@ -253,13 +284,19 @@ export class Element {
 				html += `<${tag}`
 
 				const classes = this.class.concat(this.feature.class || [])
+				if (this.feature.consumeStart()) {
+					classes.push('size-' + (this.consumed.length + 1))
+				}
 				if (classes.length) {
-					let classesAttribute = classes.join(' ')
-					if (this.feature.consumeStart()) {
-						classesAttribute = classesAttribute.replace('$', (this.consumed.length + 1).toString())
-					}
+					html += ` class="${classes.join(' ')}"`
+				}
 
-					html += ` class="${classesAttribute}"`
+				let styles = ''
+				for (const [key, value] of Object.entries(this.styles)) {
+					styles += `${key}:${value};`
+				}
+				if (styles) {
+					html += ` style="${styles.replace(/"/g, '\\"')}"`
 				}
 
 				for (const [key, value] of Object.entries(this.attributes)) {

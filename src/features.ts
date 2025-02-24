@@ -6,7 +6,11 @@ export const features: Feature[] = [
 	{ feature: 'section section ___', block: true, child: 'column' },
 	{ feature: 'section header ^^^', block: true, child: 'column' },
 	{ feature: 'section footer ~~~', block: true, child: 'column' },
-	{ feature: 'column div |||', block: true, class: 'column column-$', textContainer: 'paragraph' },
+	{ feature: 'column div |||', block: true, class: 'column', textContainer: 'paragraph' },
+	{ feature: 'style \\#', style: 'parent', text: true },
+	{ feature: 'style \\=', style: 'page' },
+	{ feature: 'style \\_', style: 'section' },
+	{ feature: 'style \\|', style: 'column' },
 	{ feature: 'hr hr --- \n', void: true, break: ['paragraph'] },
 	{ feature: 'bold strong ** **' },
 	{ feature: 'small small -- --' },
@@ -17,6 +21,7 @@ export const features: Feature[] = [
 	{ feature: 'sup sup ^ ^' },
 	{ feature: 'sub sub ~ ~' },
 	{ feature: 'quote q " "' },
+	{ feature: 'code code ` ` " "', raw: true },
 	{ feature: 'header h$ # \n' },
 	{ feature: 'title div @ \n', class: 'page-title', target: ['page'] },
 	{ feature: 'center >><<', attribute: 'class', value: 'text-center', target: ['paragraph', 'column'], text: true },
@@ -45,7 +50,7 @@ export const textFeatures: TextFeature[] = [
 	},
 	{ name: 'link', regexp: /\[(.*?)\]\((.*?)\)/, replace: '<a href="$2">$1</a>' },
 	{ name: 'autolink', regexp: /(^|\s)(https?:\/\/[^\s]+)/, replace: '$1<a href="$2">$2</a>' },
-	{ name: 'apostrophe', regexp: /'/g, replace: '’', parent: 'paragraph' }
+	{ name: 'apostrophe', regexp: /'/g, replace: '’' }
 ].map((options) => {
 	return new TextFeature(options.name, options.regexp, options.replace)
 })

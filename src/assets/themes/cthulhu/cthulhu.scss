@@ -49,6 +49,10 @@
 		background-blend-mode: lighten;
 		font-family: "Playwrite USA Traditional Light", sans-serif;
 
+		h1 {
+			color: var(--h1)
+		}
+
 		&:nth-child(even) {
 			background-position: right;
 		}

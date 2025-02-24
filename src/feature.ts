@@ -10,9 +10,12 @@ export class Feature {
 	textContainer?: string
 	target?: string[]
 	attribute?: string
+	style?: string
 	value?: string
 	break?: string[]
 	text?: boolean
+	raw?: boolean
+	silent?: boolean
 	append?: (element: Element) => string
 
 	constructor(
@@ -30,6 +33,12 @@ export class Feature {
 			this.end = '\n'
 			this.tag = ''
 			this.void = true
+		} else if (this.style) {
+			this.start = this.tag
+			this.end = '\n'
+			this.tag = ''
+			this.raw = true
+			this.silent = true
 		}
 	}
 
