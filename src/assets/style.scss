@@ -254,13 +254,21 @@ article {
 	img {
 		max-width: 100%;
 		height: auto;
+	}
 
+	img[height] {
+		height: revert-layer;
+	}
+
+	.img-container {
 		&.img-left {
 			float: left;
+			margin-right: 0.25cm;
 		}
 
 		&.img-right {
 			float: right;
+			margin-left: 0.25cm;
 		}
 
 		&.img-center {
@@ -268,10 +276,6 @@ article {
 			margin-left: auto;
 			margin-right: auto;
 		}
-	}
-
-	img[height] {
-		height: revert-layer;
 	}
 }
 

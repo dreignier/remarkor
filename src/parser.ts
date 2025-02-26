@@ -296,7 +296,7 @@ export class Element {
 					styles += `${key}:${value};`
 				}
 				if (styles) {
-					html += ` style="${styles.replace(/"/g, '\\"')}"`
+					html += ` style="${styles.replace(/"/g, '&quot;')}"`
 				}
 
 				for (const [key, value] of Object.entries(this.attributes)) {

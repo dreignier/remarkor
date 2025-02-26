@@ -42,11 +42,15 @@ export function findFeature(name: string): Feature {
 }
 
 export const textFeatures: TextFeature[] = [
-	{ name: 'image', regexp: /!([0-9x]*[><]*)\[(.*?)\]\((.*?)\)/, replace: (_: string, attributes: string, alt: string, src: string) => `<img src="${src}" alt="${alt}"${parseAttributes(attributes)}>` },
+	{
+		name: 'image',
+		regexp: /!([0-9x]*[><]*)\[(.*?)\]\((.*?)\)/,
+		replace: (_: string, parameters: string, alt: string, src: string) => img(parameters, src, alt)
+	},
 	{
 		name: 'autoimage',
 		regexp: /(^|\s)!([0-9x]*[><]*)(https?:\/\/[^\s]+)/,
-		replace: (_: string, before: string, attributes: string, src: string) => `${before}<img src="${src}"${parseAttributes(attributes)}>`
+		replace: (_: string, before: string, parameters: string, src: string) => before + img(parameters, src)
 	},
 	{ name: 'link', regexp: /\[(.*?)\]\((.*?)\)/, replace: '<a href="$2">$1</a>' },
 	{ name: 'autolink', regexp: /(^|\s)(https?:\/\/[^\s]+)/, replace: '$1<a href="$2">$2</a>' },
@@ -55,30 +59,36 @@ export const textFeatures: TextFeature[] = [
 	return new TextFeature(options.name, options.regexp, options.replace)
 })
 
-function parseAttributes(attributes: string): string {
-	attributes = attributes.replace(';', '')
+function img(parameters: string, src: string, alt?: string) {
+	return `<div ${parseImgClass(parameters)}><img src="${src}" alt="${alt || ''}" ${parseImgSize(parameters)}></div>`
+}
 
-	if (!attributes) {
+function parseImgClass(parameters: string) {
+	let classes = 'img-container'
+
+	if (parameters.endsWith('>><<')) {
+		classes += ' img-center'
+	} else if (parameters.endsWith('>>')) {
+		classes += ' img-right'
+	} else if (parameters.endsWith('<<')) {
+		classes += ' img-left'
+	}
+
+	return `class="${classes}"`
+}
+
+function parseImgSize(parameters: string) {
+	parameters = parameters.replace(/[><]/g, '')
+
+	if (!parameters) {
 		return ''
 	}
 
-	let classes = ''
-	if (attributes.endsWith('>><<')) {
-		classes = 'img-center'
-		attributes = attributes.slice(0, -4)
-	} else if (attributes.endsWith('>>')) {
-		classes = 'img-right'
-		attributes = attributes.slice(0, -2)
-	} else if (attributes.endsWith('<<')) {
-		classes = 'img-left'
-		attributes = attributes.slice(0, -2)
-	}
-
-	const [width, height] = attributes.split('x')
+	const [width, height] = parameters.split('x')
 
 	if (!width && !height) {
 		return ''
 	}
 
-	return `class="${classes}" width="${width ? width + 'px' : 'auto'}" height="${height ? height + 'px' : 'auto'}"`
+	return `width="${width ? width + 'px' : 'auto'}" height="${height ? height + 'px' : 'auto'}"`
 }

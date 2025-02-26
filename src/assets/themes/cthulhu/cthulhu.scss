@@ -42,23 +42,30 @@
 
 .cthulhu {
 	article {
-		background-image: url("background.png");
-		background-size: auto 100%;
+		background-size: 100% 100%;
 		background-repeat: no-repeat;
-		background-color: rgba(255, 255, 255, 0.5);
-		background-blend-mode: lighten;
 		font-family: "Playwrite USA Traditional Light", sans-serif;
+
+		.img-container {
+			background-image: url("photo.png");
+			background-size: 100% 100%;
+			background-repeat: no-repeat;
+
+			img {
+				padding: 4% 5% 5.5% 3.5%;
+			}
+		}
 
 		h1 {
 			color: var(--h1)
 		}
 
-		&:nth-child(even) {
-			background-position: right;
+		&:nth-child(odd) {
+			background-image: url("background1.png");
 		}
 
-		&:nth-child(odd) {
-			background-position: left;
+		&:nth-child(even) {
+			background-image: url("background2.png");
 		}
 
 		.page-number, .page-title {
@@ -97,6 +104,15 @@
 			font-weight: bold;
 			font-size: 10px;
 			margin-left: 0;
+		}
+
+		&.cover {
+			background-image: url('cover.png');
+			padding: 9cm 2cm 0 2cm;
+
+			.page-number {
+				display: none;
+			}
 		}
 	}
 }
