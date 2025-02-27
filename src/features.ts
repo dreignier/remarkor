@@ -60,7 +60,7 @@ export const textFeatures: TextFeature[] = [
 })
 
 function img(parameters: string, src: string, alt?: string) {
-	return `<div ${parseImgClass(parameters)}><img src="${src}" alt="${alt || ''}" ${parseImgSize(parameters)}></div>`
+	return `<div ${parseImgClass(parameters)} ${parseImgSize(parameters)}><img src="${src}" alt="${alt || ''}"></div>`
 }
 
 function parseImgClass(parameters: string) {
@@ -90,5 +90,5 @@ function parseImgSize(parameters: string) {
 		return ''
 	}
 
-	return `width="${width ? width + 'px' : 'auto'}" height="${height ? height + 'px' : 'auto'}"`
+	return `style="width:${width ? width + 'px' : 'auto'};height:${height ? height + 'px' : 'auto'}"`
 }
